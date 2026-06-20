@@ -1,0 +1,12 @@
+{
+  "name": "Your Name",
+  "title": "A short, descriptive title for your portfolio",
+  "slug": "your-username-short-name",
+  "type": "static",
+  "description": "One or two sentences describing your portfolio. Keep it under 200 characters.",
+  "tech": ["HTML", "CSS", "JavaScript"],
+  "tags": ["minimalist"],
+  "github": "https://github.com/your-username",
+  "demo_url": "",
+  "screenshot": "preview.png"
+}

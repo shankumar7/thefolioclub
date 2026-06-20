@@ -1,0 +1,107 @@
+name: Portfolio submission
+description: Submit your portfolio for the gallery without using git
+title: "[Portfolio] "
+labels: ["portfolio-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form if you don't want to use git/GitHub directly. A
+        maintainer (or the submission bot) will turn this into a pull
+        request for you. Prefer git? Open a PR instead — see CONTRIBUTING.md.
+
+  - type: input
+    id: name
+    attributes:
+      label: Your name
+      placeholder: Jane Doe
+    validations:
+      required: true
+
+  - type: input
+    id: github_username
+    attributes:
+      label: Your GitHub username
+      description: Used to build your folder name and credit you
+      placeholder: janedoe
+    validations:
+      required: true
+
+  - type: input
+    id: short_slug
+    attributes:
+      label: Short slug for your portfolio
+      description: Lowercase, hyphen-separated, no spaces. e.g. "minimalist" or "darkmode-v2"
+      placeholder: minimalist
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: Portfolio title
+      description: Short headline shown on your gallery card
+      placeholder: Minimalist developer portfolio
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: One or two sentences about your portfolio
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Submission type
+      description: See CONTRIBUTING.md if you're unsure which to pick
+      options:
+        - "static — plain HTML/CSS/JS, no build step"
+        - "prebuilt — built with a framework, submitting compiled output"
+        - "external — already hosted elsewhere, just link to it"
+    validations:
+      required: true
+
+  - type: input
+    id: tech
+    attributes:
+      label: Technologies used
+      description: Comma-separated
+      placeholder: HTML, CSS, JavaScript
+    validations:
+      required: true
+
+  - type: input
+    id: tags
+    attributes:
+      label: Style tags (optional)
+      description: Comma-separated, for filtering in the gallery
+      placeholder: minimalist, dark-mode
+
+  - type: input
+    id: demo_url
+    attributes:
+      label: Live demo URL
+      description: Required if you selected "external" above
+      placeholder: https://janedoe.dev
+
+  - type: input
+    id: source_link
+    attributes:
+      label: Link to your files
+      description: A zip, a GitHub repo, or a Google Drive link with your static site files and screenshot
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: This is my own work, or I have permission to submit it
+          required: true
+        - label: I understand a maintainer will review this before it goes live
+          required: true

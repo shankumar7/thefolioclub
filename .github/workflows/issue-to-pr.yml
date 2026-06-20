@@ -1,0 +1,73 @@
+name: Issue submission to draft PR
+
+# Turns a filled-out "Portfolio submission" issue form into a draft PR with
+# a scaffolded folder, so non-git contributors don't have to touch git at
+# all. Triggered only when a maintainer applies the `portfolio-submission`
+# label — that's a deliberate human gate before anything runs.
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  scaffold:
+    if: github.event.label.name == 'portfolio-submission'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Scaffold folder from issue form
+        id: scaffold
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          OUTPUT=$(node .github/scripts/issue-to-portfolio.mjs)
+          echo "$OUTPUT"
+          SLUG=$(echo "$OUTPUT" | tail -n 1)
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+
+      - name: Create branch, commit scaffold, push
+        run: |
+          git config user.name "portfolio-hub-bot"
+          git config user.email "actions@github.com"
+          BRANCH="submission/${{ steps.scaffold.outputs.slug }}"
+          git checkout -b "$BRANCH"
+          git add "f1/${{ steps.scaffold.outputs.slug }}"
+          git commit -m "Scaffold submission: ${{ steps.scaffold.outputs.slug }}"
+          git push origin "$BRANCH"
+
+      - name: Open draft pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const slug = "${{ steps.scaffold.outputs.slug }}";
+            const issueNumber = ${{ github.event.issue.number }};
+            const pr = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Portfolio submission: ${slug}`,
+              head: `submission/${slug}`,
+              base: "main",
+              draft: true,
+              body: `Auto-scaffolded from #${issueNumber}.\n\nIf a file is named ` +
+                `\`NEEDS_FILES.md\` inside the new folder, the contributor's files ` +
+                `still need to be added before this is ready for review.`,
+            });
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `Started a draft PR for this submission: #${pr.data.number}. ` +
+                `A maintainer will help finish it up and mark it ready for review.`,
+            });

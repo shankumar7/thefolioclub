@@ -1,0 +1,12 @@
+{
+  "name": "Alex Rivera",
+  "title": "Minimalist developer portfolio",
+  "slug": "demo-alex-rivera",
+  "type": "static",
+  "description": "A single-page dark portfolio with a monospace type system and a project list.",
+  "tech": ["HTML", "CSS", "JavaScript"],
+  "tags": ["minimalist", "dark-mode", "monospace"],
+  "github": "https://github.com/example",
+  "demo_url": "",
+  "screenshot": "preview.png"
+}

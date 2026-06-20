@@ -1,0 +1,12 @@
+{
+  "name": "Priya Nataraj",
+  "title": "Bold, color-blocked design portfolio",
+  "slug": "demo-priya-nataraj",
+  "type": "static",
+  "description": "A high-contrast, color-blocked layout for a product designer's case studies.",
+  "tech": ["HTML", "CSS"],
+  "tags": ["bold", "colorful", "design"],
+  "github": "https://github.com/example",
+  "demo_url": "",
+  "screenshot": "preview.png"
+}

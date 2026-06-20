@@ -1,0 +1,88 @@
+name: Validate portfolio submission
+
+on:
+  pull_request:
+    paths:
+      - "f1/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Deliberately no `npm install` step here, and nothing in this job
+      # ever executes code from inside f1/<submission>/. The validator
+      # below only reads files with Node's built-in fs module.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run portfolio validator
+        id: validate
+        run: |
+          set +e
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          CHANGED=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- f1/ | cut -d/ -f1-2 | sort -u)
+          echo "Changed folders:"
+          echo "$CHANGED"
+          node .github/scripts/validate-portfolios.mjs $CHANGED > validation-output.txt 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat validation-output.txt
+
+      - name: Comment validation result on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const output = fs.readFileSync("validation-output.txt", "utf8");
+            const passed = "${{ steps.validate.outputs.exit_code }}" === "0";
+            const body = [
+              passed ? "### Portfolio validation passed" : "### Portfolio validation failed",
+              "",
+              "```",
+              output.trim(),
+              "```",
+              "",
+              passed
+                ? "Looks good — a maintainer will review the actual content next."
+                : "Fix the issue(s) above and push again to this same branch.",
+            ].join("\n");
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(
+              (c) => c.user.type === "Bot" && c.body.includes("Portfolio validation")
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Fail job if validation failed
+        if: steps.validate.outputs.exit_code != '0'
+        run: exit 1

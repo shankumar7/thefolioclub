@@ -1,0 +1,29 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  background: #F8F8F2;
+  color: #181A15;
+}
+.hero {
+  background: #2F3DCB;
+  color: #EEF0E8;
+  padding: 4rem 1.5rem;
+}
+.hero h1 {
+  margin: 0 0 0.75rem;
+  font-size: 3rem;
+  line-height: 1.05;
+}
+main {
+  display: grid;
+  gap: 1.5px;
+  background: #181A15;
+}
+.case {
+  padding: 2.5rem 1.5rem;
+}
+.case h2 { margin-top: 0; }
+.card-blue { background: #E3E6FB; }
+.card-amber { background: #FCE9C9; }
+.card-green { background: #DDEFD9; }
